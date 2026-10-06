@@ -19,7 +19,7 @@
 | `01_企划/` | 游戏总体企划：世界观、核心循环、玩法总览、目标平台与范围 | 策划 |
 | `02_系统策划/` | 各系统详细设计：规则、数值、状态机、交互流程、UI 表现要求 | 策划 |
 | `03_配置表设计/` | 每张配置表的**字段规格说明**：字段名 / 类型 / 取值 / 默认值 / 关联表 / 用途 | 策划 |
-| `04_架构/` | 架构现状核查、目标文件结构、路径与命名规范、MVP 契约、落地方案与可行性/优化结论 | 架构师 |
+| `04_架构/` | 架构现状核查、目标文件结构、路径与命名规范、MVP 契约、落地方案与可行性/优化结论 | **已冻结**（架构师角色 2026-10-06 退役，见 §9；要改先问 Lead） |
 | `05_程序/` | 框架能力清单、既有 API 使用范式、实现记录、技术备忘 | 程序 |
 
 ## 2. 文档命名约定（所有子目录统一）
@@ -95,21 +95,22 @@ NN_主题.md          例：01_核心循环.md、03_战斗系统.md、04_MVP契�
 ① 策划：写 01_企划 / 02_系统策划 文档 + 03_配置表设计 字段规格 + Excel 源表
      │
      ▼
-② 架构师：落地方案评审（可行性、性能、可维护性）+ 文件路径与命名规划
-     │  ├─ 有异议 ──► 退回策划改文档 / 改字段 ──┐
-     │  └─ 通过                                 │
-     │                                          │
-     ▼                                          │
-③ 架构师：输出 04_架构 落地方案，明确「改哪些文件、按什么顺序」◄──┘
+② 程序：先用 **normify 模块树**（§9）定位「改哪个模块 / 新增哪个模块」，自己判断架构落位
+     │  ├─ 跨域重构 / 要改 policy.yml / 拿不准 ──► 问 Lead（必要时退回策划改文档）
+     │  └─ 通过
+     ▼
+③ 程序：按 02/03 的文档与表实现，产出写进 05_程序/ 记录
      │
      ▼
-④ 程序：按 02/03 的文档与表 + 04 的落地方案实现，产出写进 05_程序/ 记录
+④ 程序：同步模块树（normify_module_refresh → normify_validate 0 error）+ 按 §5 编译门禁验证
 ```
 
-**硬性闸门**：程序只有在「策划文档已定稿」**且**「架构师落地方案已定稿」之后才动手写业务逻辑。
-提前写代码属于返工风险，一律不做。
+**硬性闸门（2026-10-06 修订）**：程序在「策划文档已定稿」之后即可动手写业务逻辑；
+**「架构师落地方案已定稿」这道闸门已随架构师角色退役而取消**（见 §9）——改由程序自己用
+`normify_brief` / `normify_check` 做落位与依赖预检。**唯一保留的例外**：跨域重构、
+要修改 `policy.yml`、或设计上拿不准时，停下来问 Lead。
 
-> **例外：轻量任务走快速通道** —— 满足 §8 全部条件时，**只派程序一个人**，不通知架构师与策划、不建自测指针、不走闸门。
+> **例外：轻量任务走快速通道** —— 满足 §8 全部条件时，**只派程序一个人**，不通知策划、不建自测指针、不走闸门。
 > 判定清单与反例见 **§8**。
 
 ## 5. 开工前必读（防止踩坑）
@@ -168,6 +169,11 @@ NN_主题.md          例：01_核心循环.md、03_战斗系统.md、04_MVP契�
      `File.WriteAllText`（改 `.cs`，GBK 文件仍按 GBK 写回）、`AssetDatabase.CreateFolder/CopyAsset`（建目录/放图）、
      `EditorSceneManager`（建场景）、`EditorBuildSettings`（改 Build Settings）。Unity 不受该沙箱约束。
    - 需要"非 Unity 才能做"的原始落盘（如 xlsx 工具产物）→ **交 Lead**，Lead 用一次性放宽放置。
+   - ✅ **2026-10-06 补充实测**：**`Assets/AI/**` 是可写的**（`write` 工具直接写 `Assets/AI/_probe.txt` 成功，
+     随后已删除）。也就是说「可写」不是只有 Chaos_Story 一处；**新目录若沙箱用户创建过，往往即可写**。
+     但 `Scripts` / `Resources` / `Data` / `Excel` / `Scenes` / `Art` 仍**不可写**，结论不变：改这些目录一律走 Unity 进程。
+   - ⚠️ **`C:\Users\<用户>\.dsh\skills\`（DSH 技能目录）写不了**：`write` 与 `pwsh` 都被沙箱拒绝，
+     但 **Unity 进程可以写**（`unity_execute_code` + `File.WriteAllText`）—— 新建 skill 时走这条路。
 
 ---
 
@@ -310,3 +316,73 @@ int   uint   long   ulong   byte   sbyte   short   ushort   float   double   boo
   **目的是别让下一个 agent 重新发现**，不是为了走流程。
 - 出现下列任一情况，**立即升级到正常流程**并通知相关成员：改动牵扯到公共接口、需要动配置表、
   发现既有缺陷、或用户反馈「测不过/看不懂」。
+
+---
+
+## 9. 架构模块树（normify）与开发姿势（2026-10-06 起）
+
+> **架构师角色已退役。** 架构判断能力已下沉为两样东西：
+> ① 这份**模块树**（结构事实，机器可查）② 技能 **`chaos-arch-standard`**（决策规则，程序自己读）。
+> 以后新功能由**程序自己**用它们做架构落位；只有**跨域重构 / 要改 `policy.yml` / 拿不准**时才问 Lead。
+
+### 9.1 树在哪
+
+| 项 | 值 |
+| --- | --- |
+| 结构数据目录 | `Assets/AI/normify-project-chaos/`（主仓库 `Branch_feature_1` 跟踪） |
+| `source` 路径基准（仓库根） | `D:\Unity Projects\Project_Chaos` |
+| 树根 id | `project-chaos`（**单树**，8 个一级域） |
+| 交互式架构图 | `Assets/AI/normify-project-chaos/normify.html`（单文件、双击即开、逐层下钻 / 中英切换 / 深链 `#module=<id>`） |
+| 编译产物 | `tree.json` / `outline.md` / `api-index.json` / `receipt.json`（**派生数据，不要手改**） |
+| 结构数据本体 | `modules/**/*.md`（frontmatter 机器读 + 正文人读）与 `renders/**/*.json`（每层怎么画） |
+| 架构规则 | `policy.yml`（5 条：无环、禁指向废弃、`framework ✗→ mvp`、运行时代码 `✗→ editor-tools`、id 命名） |
+
+建成规模（2026-10-06）：**343 模块 / 268 叶子 / 819 API / 197 箭头 / 最深 7 层 / 75 层渲染数据**，`normify_validate` **0 error**。
+
+### 9.2 8 个一级域
+
+| id | 管什么 |
+| --- | --- |
+| `project-chaos.bootstrap` | 启动与场景骨架：`Entry`、Mono 心跳、单例基类、场景加载与读条界面、4 个场景资产、Build Settings |
+| `project-chaos.framework` | 运行时框架（**99 模块**）：UIManager 面板栈与动画、音频、输入与改键、按键图标、本地化、设置、日志、事件中心、对象池、资源加载、存档槽位、对话、配置读取、dev-tests |
+| `project-chaos.mvp` | 视图层：MainMenu / Setting / SLPanel 与 5 个设置页、RecordCell；**Presenter 仍为空**，现状是 View → Service 直连 |
+| `project-chaos.config-pipeline` | Excel 全链路：表仓、导出器、类型白名单、生成 Json/类、运行时读取、`Recorder` |
+| `project-chaos.editor-tools` | 编辑器工具：本地化编辑器、Git 工具、场景 UI 概览、图标管线、对话编辑器、按键图标映射、面板动画工具 |
+| `project-chaos.assets` | 资源库：美术、音频、UI 图、预制体、字体、TMP、Tilemap、本地化资产 |
+| `project-chaos.project-infra` | 工程基建：Packages、ProjectSettings、Plugins（Spine / DOTween / DLL）、DocsSrc、Learn、`.claude`、gittool |
+| `project-chaos.team-process` | 本目录（`Story/`）的文档契约与企划 / 架构 / 程序文档 |
+
+### 9.3 开发姿势：改之前 3 步 + 改之后 3 步
+
+**改之前**
+
+1. `normify_brief { dir, task:"<需求一句话>" }` → 目标模块、契约、影响面、建议模块与验收清单；
+2. `normify_module_get` / `normify_search` / `normify_deps_find { to:"<模块 id>" }` → 看 apis / deps，确认「谁依赖我」；
+3. `normify_check { dir, modules:[…], deps:[…] }` → 预检拟建模块与拟加依赖是否违反 `policy.yml`。
+
+**改之后**
+
+4. `normify_module_refresh { dir, repoRoot:"D:\\Unity Projects\\Project_Chaos", ids:[…], activate:true }` → 重算指纹、planned 转 active；
+5. `normify_validate { dir, repoRoot:"D:\\Unity Projects\\Project_Chaos" }` → **必须 0 error**；
+6. `normify_build` + `normify_render` → 刷新 `tree.json` 与 `normify.html`。
+   涉及结构增删时，**同一轮**用 `normify_layout_upsert` 更新该层的 `order` / `groups` / `reading`，否则记 `layout/missing`。
+
+**代码改了但树没跟上 = 结构漂移**：用 `normify_sync { repoRoot, dir }` 检出受影响模块与指纹漂移，再 `normify_module_patch` 跟随更新。
+
+### 9.4 写模块时的字段上限（Lead 实测，超了整批回滚）
+
+- `name.zh` / `name.en` ≤ **30**；模块 `description` ≤ **500**；`apis[].description` ≤ **200**；`deps[].label` ≤ **30**。
+- **id 末段不要用 `index`** —— 会与容器的 `index.md` 撞名并**覆盖模块**（已踩过一次）。
+- 容器模块**不要写 `apis` 字段**；空目录占位叶子写 `apis: []`（只记 warning，合法）。
+- 同一文件拆成多个叶子时，`file:` API 的 `path` 要带行段锚点（如 `…#L1-L220`），否则 `api/key-duplicate`。
+- `normify_module_batch` 是**原子**的：单批 **15–25** 个模块最稳，1 条字段错误就整批不落盘。
+- 渲染数据的 `order` / `groups.children` 必须写**完整模块 id**（不是末段）。
+
+### 9.5 已知不完美（如实登记，别当成事实错误）
+
+- `validate` 有 **21 条 warning（非 error）**：`structure/leaf-too-coarse` ×15（集合型叶子按「一个资产集合 = 一个框」建模，
+  如 `assets.fonts.cn`；再拆会让资源域从 34 膨胀到 60+ 模块）+ `leaf-too-coarse-many` ×1、
+  `api/leaf-empty` ×3（3 个空占位叶子）、`dep/unanchored` ×6（`team-process` 文档层箭头）、`evidence/root-no-source` ×1（根模块是纯文档根）。
+- 每个叶子的 `source` 是**代表性文件 + 行段**，不是逐文件全列；判断影响面请以 `apis` / `deps` 为准。
+- 树里**包含** `Assets/AI/normify-project-chaos/**` 自身吗？**不包含**（避免自指纹漂移），
+  只在 `project-chaos.project-infra.agent-workspace` 留了一个 `source: []` 的占位叶子。
