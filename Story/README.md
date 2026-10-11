@@ -382,9 +382,32 @@ int   uint   long   ulong   byte   sbyte   short   ushort   float   double   boo
 
 ### 9.5 已知不完美（如实登记，别当成事实错误）
 
-- `validate` 有 **21 条 warning（非 error）**：`structure/leaf-too-coarse` ×15（集合型叶子按「一个资产集合 = 一个框」建模，
-  如 `assets.fonts.cn`；再拆会让资源域从 34 膨胀到 60+ 模块）+ `leaf-too-coarse-many` ×1、
-  `api/leaf-empty` ×3（3 个空占位叶子）、`dep/unanchored` ×6（`team-process` 文档层箭头）、`evidence/root-no-source` ×1（根模块是纯文档根）。
+- `validate` 有 **20 条 warning（非 error）**：`structure/leaf-too-coarse` ×15（集合型叶子按「一个资产集合 = 一个框」建模，
+  如 `assets.art.ui-kit.*`、`assets.tilemap.kenney`、`assets.fonts.cn`；再拆会让资源域膨胀到 60+ 模块）+ `leaf-too-coarse-many` ×1、
+  `api/leaf-empty` ×2（`mvp.presenter` / `assets.animations` 两个空占位叶子）、`dep/unanchored` ×1（文档层箭头，聚合）、
+  `evidence/root-no-source` ×1（根模块是纯文档根）。
 - 每个叶子的 `source` 是**代表性文件 + 行段**，不是逐文件全列；判断影响面请以 `apis` / `deps` 为准。
-- 树里**包含** `Assets/AI/normify-project-chaos/**` 自身吗？**不包含**（避免自指纹漂移），
-  只在 `project-chaos.project-infra.agent-workspace` 留了一个 `source: []` 的占位叶子。
+- 树里**包含** `Assets/AI/normify-project-chaos/**` 自身吗？**不包含**（避免自指纹漂移）；
+  `Assets/AI/runmap-art/**` 则**已测绘**（`project-chaos.project-infra.agent-workspace.runmap-art`）。
+
+---
+
+## 10. 子智能体编制（用户 2026-10-12 规定 —— 硬约束）
+
+**常驻只有 2 个：**
+
+| 角色 | 成员名 | 职责 |
+| --- | --- | --- |
+| 策划 | `designer` | `Story/01_企划`、`02_系统策划`、`03_配置表设计`、`00_索引.md`；新建 `Excel/Chaos_excel/*.xlsx` |
+| 前端程序 | `programmer` | `Scripts/`、预制体、场景、实现记录；按 skill `chaos-arch-standard` 自行做架构落位（§9） |
+
+**架构师（`architect`）角色已退役，不要重建。** 架构判断能力 = 模块树（§9）+ skill `chaos-arch-standard`。
+
+**其余成员一律一次性：** 需要并行测绘 / 审计 / 专项实现时，Lead 临时派一个成员，
+**任务完成即弃用**——不再 `send_message`、不认领第二个任务、不跨任务复用；下次需要就重新派新的。
+
+> ⚠ **harness 限制（Lead 2026-10-12 实测，别再浪费时间去试）**：本版 DSH 的团队工具只有
+> `spawn_teammate` / `list_agents` / `send_message` / `interrupt_agent` / `wait_agent` **5 个，没有任何删除 / 解散工具**；
+> `dsh` CLI 也只有 profile / plugin 命令。所以「删掉成员」在工具层做不到，只能做到：
+> ① **不再使用**（不派任务、不发消息）；② 任务板上**不留它名下的进行中任务**；③ 需要时由用户在本机清理其会话数据。
+> **「用完即弃」靠纪律，不靠工具。**
