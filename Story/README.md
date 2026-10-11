@@ -337,20 +337,22 @@ int   uint   long   ulong   byte   sbyte   short   ushort   float   double   boo
 | 结构数据本体 | `modules/**/*.md`（frontmatter 机器读 + 正文人读）与 `renders/**/*.json`（每层怎么画） |
 | 架构规则 | `policy.yml`（5 条：无环、禁指向废弃、`framework ✗→ mvp`、运行时代码 `✗→ editor-tools`、id 命名） |
 
-建成规模（2026-10-06）：**343 模块 / 268 叶子 / 819 API / 197 箭头 / 最深 7 层 / 75 层渲染数据**，`normify_validate` **0 error**。
+建成规模（2026-10-06 首次建成）：343 模块 / 268 叶子 / 819 API / 197 箭头。
+**2026-10-11 增量同步**（局内地图生成 runmap + GM 控制台 + UI 切图库 + 中国地图；320 个新增文件全部进树）后为
+**406 模块 / 324 叶子 / 905 API / 216 箭头 / 最深 7 层 / 82 层渲染数据**，`normify_validate` **0 error / 20 warning**。
 
 ### 9.2 8 个一级域
 
 | id | 管什么 |
 | --- | --- |
-| `project-chaos.bootstrap` | 启动与场景骨架：`Entry`、Mono 心跳、单例基类、场景加载与读条界面、4 个场景资产、Build Settings |
-| `project-chaos.framework` | 运行时框架（**99 模块**）：UIManager 面板栈与动画、音频、输入与改键、按键图标、本地化、设置、日志、事件中心、对象池、资源加载、存档槽位、对话、配置读取、dev-tests |
+| `project-chaos.bootstrap` | 启动与场景骨架：`Entry`、Mono 心跳、单例基类、场景加载与读条界面、5 个场景资产（含尚未登记的 `MainScene`）、Build Settings |
+| `project-chaos.framework` | 运行时框架（**18 子域**）：UIManager 面板栈与动画、音频、输入与改键、按键图标、本地化、设置、日志、事件中心、对象池、资源加载、存档槽位、对话、配置读取、**局内地图生成（runmap）**、跨场景常驻、dev-tests（含 GM 控制台） |
 | `project-chaos.mvp` | 视图层：MainMenu / Setting / SLPanel 与 5 个设置页、RecordCell；**Presenter 仍为空**，现状是 View → Service 直连 |
-| `project-chaos.config-pipeline` | Excel 全链路：表仓、导出器、类型白名单、生成 Json/类、运行时读取、`Recorder` |
-| `project-chaos.editor-tools` | 编辑器工具：本地化编辑器、Git 工具、场景 UI 概览、图标管线、对话编辑器、按键图标映射、面板动画工具 |
-| `project-chaos.assets` | 资源库：美术、音频、UI 图、预制体、字体、TMP、Tilemap、本地化资产 |
-| `project-chaos.project-infra` | 工程基建：Packages、ProjectSettings、Plugins（Spine / DOTween / DLL）、DocsSrc、Learn、`.claude`、gittool |
-| `project-chaos.team-process` | 本目录（`Story/`）的文档契约与企划 / 架构 / 程序文档 |
+| `project-chaos.config-pipeline` | Excel 全链路：表仓（含地图生成 7 张表）、导出器、类型白名单、生成 Json/类、运行时读取、`Recorder` |
+| `project-chaos.editor-tools` | 编辑器工具：本地化编辑器、Git 工具、场景 UI 概览、图标管线、对话编辑器、按键图标映射、面板动画工具、地图占位/校验工具 |
+| `project-chaos.assets` | 资源库：美术（含 `Art/UI` 164 张切图库）、音频、UI 图、预制体（含 RunMap 房间块 36 个）、字体、TMP、Tilemap（Kenney / 占位两套）、本地化资产 |
+| `project-chaos.project-infra` | 工程基建：Packages、ProjectSettings、Plugins（Spine / DOTween / DLL）、DocsSrc、Learn、`.claude`、gittool、Agent 工作区（含 `runmap-art`） |
+| `project-chaos.team-process` | 本目录（`Story/`）的文档契约与企划 / 架构 / 程序文档（含 `02_系统策划/01_局内地图生成系统.md`） |
 
 ### 9.3 开发姿势：改之前 3 步 + 改之后 3 步
 
