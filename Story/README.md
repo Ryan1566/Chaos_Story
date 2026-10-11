@@ -411,3 +411,21 @@ int   uint   long   ulong   byte   sbyte   short   ushort   float   double   boo
 > `dsh` CLI 也只有 profile / plugin 命令。所以「删掉成员」在工具层做不到，只能做到：
 > ① **不再使用**（不派任务、不发消息）；② 任务板上**不留它名下的进行中任务**；③ 需要时由用户在本机清理其会话数据。
 > **「用完即弃」靠纪律，不靠工具。**
+
+### 10.1 已弃用成员登记（**不要复用**）
+
+| 成员 | 曾经的职责 | 它留下的东西 | 为什么不能复用 |
+| --- | --- | --- | --- |
+| `architect` | 架构核查 / 落地方案闸门 | `Story/04_架构/**` 6 份文档 + skill `chaos-arch-standard` | 角色已退役；其上下文把**旧的架构师闸门流程**写死了 |
+| `mapper-framework` | 测绘 `framework` 子树（99 模块） | 已进模块树 | 任务书写死「只写 framework、禁止 build/render、指纹留 `pending`」，复用会拒做集成 |
+| `mapper-bootstrap-mvp` | 测绘 `bootstrap` + `mvp`（56 模块） | 已进模块树 | 同上 |
+| `mapper-tools-config` | 测绘 `editor-tools` + `config-pipeline`（63 模块） | 已进模块树 | 同上 |
+| `mapper-assets-infra` | 测绘 `assets` + `project-infra`（66 模块） | 已进模块树 | 同上 |
+| `mapper-assets-ui` | 增量补 UI 切图库 / TileMap / RunMap 预制体（11 模块） | 已进模块树 | 同上 |
+
+> 它们的会话数据仍留在 `%USERPROFILE%\.dsh\storages\session_projcache\sessions\` 与 `%USERPROFILE%\.dsh\sessions\`
+> （harness 无删除工具）——**当审计留档即可，不要再 `send_message` 唤醒**：唤醒只会重新占用上下文，
+> 且它会按**过期任务书**行动（例如"禁止 build/render"）。
+>
+> 测绘轮发现、尚未修的工程问题已登记到 **`Story/05_程序/04_待修问题清单.md`**（P0/P1/P2 共 24 条，带证据路径），
+> 不依赖任何成员的记忆 —— 这才是可以安全弃用它们的前提。
