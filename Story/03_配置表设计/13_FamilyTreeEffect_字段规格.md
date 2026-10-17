@@ -2,7 +2,7 @@
 
 > 状态：评审中
 > Owner：策划
-> 最后更新：2026-10-17
+> 最后更新：2026-10-18
 > 关联：`Story/03_配置表设计/11_FamilyTree_字段规格.md`（节点表）、`Story/03_配置表设计/08_Effect_字段规格.md`（效果表与叠加规则）、`Story/02_系统策划/08_家族树系统.md`（15 节点效果表与聚合）、`Story/03_配置表设计/01_配置表填写规范.md`、`Assets/Excel/Chaos_excel/FamilyTreeEffect_节点效果表.xlsx`
 
 > **本表是"节点 ↔ 效果"的多对多关联**：一行 = 一个关联。
@@ -112,7 +112,7 @@ FamilyTree.Index ──(NodeId)──> FamilyTreeEffect ──(EffectId)──> 
 2. 过滤 `FamilyTreeEffect`：`NodeId ∈ 已点亮` 且 `Enable = true`
 3. 对每条关联取 `Effect[EffectId]`（再判 `Effect.Enable`）；**缺失则 Warn 跳过**
 4. 按 `EffectType` 聚合（`08_Effect_` §5）：增量相加（`Value × Weight`）/ 上限取最高 / 覆盖取最后
-5. clamp 到硬范围；把结果广播给：库存（`ApplySlotEffects`）、带出上限、族人属性、扎营开关、村庄
+5. clamp 到硬范围；把结果广播给：库存（`ApplySlotEffects`）、带出上限、门客属性、扎营开关、村庄
 
 > **不要在本表里写任何"效果值"** —— 数值只在 `Effect` 表；本表只有"谁挂谁"。
 
