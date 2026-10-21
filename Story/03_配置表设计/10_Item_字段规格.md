@@ -2,7 +2,7 @@
 
 > 状态：评审中
 > Owner：策划
-> 最后更新：2026-10-18
+> 最后更新：2026-10-22
 > 关联：`Story/02_系统策划/06_资源与库存.md`（库存/格位/叠加规则）、`Story/03_配置表设计/08_Effect_字段规格.md`（效果表与叠加规则）、`Story/03_配置表设计/01_配置表填写规范.md`、`Story/03_配置表设计/02_配置表字段规格模板.md`、`Assets/Excel/Chaos_excel/Item_道具表.xlsx`
 
 > **本表是道具"模板"**：库存里存的是 `{ itemId, count }`（`ItemStackSave`），`itemId` → 本表 `Index`。
@@ -33,17 +33,18 @@
 
 ## 2. 表头填写区（7 行）
 
-| 行 | A | B | C | D | E | F | G | H |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 第 1 行（装饰） | `类名` | `Item` | | | | | | |
-| 第 2 行（装饰） | `是否读取` | `IsConfig` | | | | | | |
-| 第 3 行 中文备注 | 序号 | 名称key | 类别 | 是否扎营类 | 叠加上限 | 效果ID | 图标key | 是否启用 |
-| 第 4 行 英文属性名 | `Index` | `NameKey` | `Category` | `IsCampItem` | `StackLimit` | `EffectId` | `IconKey` | `Enable` |
-| 第 5 行 端标记 | `client` | `client` | `client` | `client` | `client` | `client` | `client` | `client` |
-| 第 6 行 类型 | `uint` | `string` | `uint` | `bool` | `uint` | `uint` | `string` | `bool` |
-| 第 7 行起 | — | — | — | — | — | — | — | **正式数据** |
+| 行 | A | B | C | D | E | F | G | H | I | J |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 第 1 行（装饰） | `类名` | `Item` | | | | | | | | |
+| 第 2 行（装饰） | `是否读取` | `IsConfig` | | | | | | | | |
+| 第 3 行 中文备注 | 序号 | 名称key | 类别 | 是否扎营类 | 叠加上限 | 效果ID | 图标key | 是否启用 | 买价 | 卖价 |
+| 第 4 行 英文属性名 | `Index` | `NameKey` | `Category` | `IsCampItem` | `StackLimit` | `EffectId` | `IconKey` | `Enable` | `BuyPrice` | `SellPrice` |
+| 第 5 行 端标记 | `client` | `client` | `client` | `client` | `client` | `client` | `client` | `client` | `client` | `client` |
+| 第 6 行 类型 | `uint` | `string` | `uint` | `bool` | `uint` | `uint` | `string` | `bool` | `uint` | `uint` |
+| 第 7 行起 | — | — | — | — | — | — | — | — | — | **正式数据** |
 
-> 共 **8 列（A~H）**；**中间不得出现空列**。
+> 共 **10 列（A~J）**；**中间不得出现空列**。
+> ⚠️ `BuyPrice` / `SellPrice` 是 **W5.3 市场（M5）** 加的两列（`02_系统策划/18_市场.md`），**卖价由表直接填（默认买价 50%），代码不计算**。
 
 ---
 
@@ -59,6 +60,8 @@
 | F | 效果ID | `EffectId` | `client` | `uint` | **外键 → `Effect.Index`**（被动效果）；**`0` = 无被动效果**。⚠️ 多效果用 `ItemEffect` 关联表（§4） | `0` 或已存在的 `Effect.Index` | `0` |
 | G | 图标key | `IconKey` | `client` | `string` | 图标资源标识（`Resources` 相对路径或 UI 切图 key）；**W1a 用占位** | 不含逗号/引号/换行 | `UI/Items/icon_potion_01` |
 | H | 是否启用 | `Enable` | `client` | `bool` | `false` = 不允许入库/不入库配置。**不能留空** | `true`/`false` | `true` |
+| I | 买价 | `BuyPrice` | `client` | `uint` | 市场买 1 个要花的**钱财**（`resMoney`）；**`0` = 不可买** | ≥0（建议 1~999） | `10` |
+| J | 卖价 | `SellPrice` | `client` | `uint` | 市场卖 1 个得到的**钱财**；**`0` = 不可卖**。**由表直接填**（约定默认 = `floor(买价 × 50%)`），**代码不计算** | ≥0（建议 1~999） | `5` |
 
 ### 3.1 开关型字段
 
@@ -70,6 +73,8 @@
 > `bool` 可填 `true`/`false`、`1`/`0`、`是`/`否`（不区分大小写，**不能留空**）；导出为**裸值** `true`/`false`。
 
 ### 3.2 `Category` 类别对照表（`uint` + 对照表，**不能用 enum**）
+
+> ⚠️ **2026-10-22 订正**：实际 `Item_道具表.xlsx`（W5.3 落地）用的是 **`1` 药品 / `2` 材料 / `3` 装备 / `4` 图纸 / `5` 消耗 / `6` 其他**；本文原表（2 甲修 / 3 材料 / 4 图纸 / 5 装备）与实表**不一致**，已按实表改写。
 
 | 值 | 类别 | 说明 | 典型用途 |
 | --- | --- | --- | --- |
@@ -150,15 +155,22 @@
 
 ## 7. 示例数据（**示范值**）
 
-| 行 | `Index` | `NameKey` | `Category` | `IsCampItem` | `StackLimit` | `EffectId` | `IconKey` | `Enable` |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 第 7 行 | 1 | `item_potion_01_name` | 1（药品） | `false` | 99 | 0 | `UI/Items/icon_potion_01` | `true` |
-| 第 8 行 | 2 | `item_armor_kit_01_name` | 2（甲修） | `true` | 99 | 0 | `UI/Items/icon_armorkit_01` | `true` |
-| 第 9 行 | 3 | `item_material_wood_name` | 3（材料） | `false` | 99 | 0 | `UI/Items/icon_wood` | `true` |
-| 第 10 行 | 4 | `item_blueprint_farm_name` | 4（图纸） | `false` | 99 | 0 | `UI/Items/icon_blueprint_farm` | `true` |
-| 第 11 行 | 5 | `item_gear_basic_name` | 5（装备） | `false` | 1 | 0 | `UI/Items/icon_gear_01` | `true` |
+> 以下是 **`Item_道具表.xlsx` 当前真实内容（9 行，2026-10-22 实测）**，可直接作为填表参考；价格列即 W5.3 市场用到的两列。
 
-> 第 11 行 `StackLimit = 1` 示范"装备不可叠加"——同样受**格位**（种类数）约束，不占 99 的额度。
+| 行 | `Index` | `NameKey` | `Category` | `IsCampItem` | `StackLimit` | `EffectId` | `IconKey` | `Enable` | `BuyPrice` | `SellPrice` |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 第 7 行 | 1 | `item_01_name` | 1（药品） | `true` | 99 | 0 | `UI/Items/icon_potion_01` | `true` | 10 | 5 |
+| 第 8 行 | 2 | `item_02_name` | 2（材料） | `false` | 99 | 0 | `UI/Items/icon_material_01` | `true` | 8 | 4 |
+| 第 9 行 | 3 | `item_03_name` | 3（装备） | `false` | 99 | 0 | `UI/Items/icon_gear_01` | `true` | 30 | 15 |
+| 第 10 行 | 4 | `item_04_name` | 4（图纸） | `false` | 99 | 0 | `UI/Items/icon_blueprint_01` | `true` | 20 | 10 |
+| 第 11 行 | 5 | `item_05_name` | 5（消耗） | `true` | 99 | 0 | `UI/Items/icon_consumable_01` | `true` | 10 | 5 |
+| 第 12 行 | 6 | `item_06_name` | 1（药品） | `false` | 99 | 0 | `UI/Items/icon_potion_02` | `true` | 10 | 5 |
+| 第 13 行 | 7 | `item_07_name` | 2（材料） | `false` | 99 | 0 | `UI/Items/icon_material_02` | `true` | 8 | 4 |
+| 第 14 行 | 8 | `item_08_name` | 3（装备） | `false` | 99 | 0 | `UI/Items/icon_gear_02` | `true` | 30 | 15 |
+| 第 15 行 | 9 | `item_09_name` | 4（图纸） | `false` | 99 | 0 | `UI/Items/icon_blueprint_02` | `true` | 20 | 10 |
+
+> **价格核对（9/9 满足约定）**：`SellPrice == floor(BuyPrice × 0.5)` —— 10/5、8/4、30/15、20/10、10/5、10/5、8/4、30/15、20/10。
+> ⚠️ 当前 `NameKey` 指向的本地化条目**尚未收集**（面板上物品名会退化成「类别+#id」）—— 已登记为 W5 遗留。
 
 ---
 
@@ -174,6 +186,8 @@
 | C6 | `IsCampItem` / `Enable` **逐行填满** | 空值 → 导出期抛异常并**中断整批导出** | 程序/策划 |
 | C7 | 同一 `EffectId` 若在 `ItemEffect` 与 `Item.EffectId` 同时表达同一效果 → **重复计算** | 属性/数量翻倍 | 策划（`策划建议`：二选一，别双写） |
 | C8 | 表格行数 ≥1（顶层硬约束） | 空表 → 无导出项/中断整批 | 程序/策划 |
+| C9 | `BuyPrice` / `SellPrice` 为 `uint`（**不能填负数/小数**）；`0` = 不可买/不可卖，两者都 0 = 该物品**不进市场列表** | 负数会变成超大数（危险） | 策划 |
+| C10 | **卖价由表直接填**，约定默认 `SellPrice = floor(BuyPrice × 50%)`；**代码不计算卖价**（个别物品可例外） | 若代码自己算，表里改价就失效 | 策划/程序 |
 
 ---
 
@@ -195,3 +209,4 @@
 | 日期 | 变更 | 变更人 |
 | --- | --- | --- |
 | 2026-10-17 | 首版（W1a）：定 8 列（`Index`/`NameKey`/`Category`/`IsCampItem`/`StackLimit`/`EffectId`/`IconKey`/`Enable`）；`Category` 1~6 + 对照表；`StackLimit` 默认 99；`EffectId` 外键 → `Effect.Index`（`0`=无）；定死 `ItemEffect` 关联表列（W1 不建）；**给出"W1a 必需新增 Effect 行 = 0"的结论** + 建议预留 `Index 6~8` 三行（含具体 `EffectType/Target/Value`）；5 行示例；C1~C8 约束；Q1~Q6 待确认。xlsx 由程序用 EPPlus 建，本次不建表。 | 策划 |
+| 2026-10-22 | **W5.3 补列（市场 M5）**：新增 **`BuyPrice`（买价）/ `SellPrice`（卖价）** 两列（均 `uint`，`0`=不可交易），**列数 8 → 10**（A~J）；补 §2 表头区、§3 逐列（I/J）、§7 示例改为**实表 9 行**（含价格，9/9 满足「卖价=买价 50%」）、C9/C10 约束（价格非负、**卖价由表填、代码不算**）。**顺带订正 §3.2 `Category` 对照表**：实表用的是 `1 药品 / 2 材料 / 3 装备 / 4 图纸 / 5 消耗 / 6 其他`（原文 2 甲修/3 材料/4 图纸/5 装备 与实表不一致）。 | 策划 |
