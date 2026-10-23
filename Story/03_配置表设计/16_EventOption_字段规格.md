@@ -1,8 +1,8 @@
 # `EventOption` 字段规格说明（事件选项表）
 
-> 状态：评审中
+> 状态：已实现
 > Owner：策划
-> 最后更新：2026-10-21
+> 最后更新：2026-10-22
 > 关联：`Story/02_系统策划/16_剧情事件.md`（事件规则与奖励口径）、`Story/03_配置表设计/15_Event_字段规格.md`（事件主表）、`Story/03_配置表设计/10_Item_字段规格.md`（物品）、`Story/03_配置表设计/09_Retainer_字段规格.md`（门客）、`Story/03_配置表设计/08_Effect_字段规格.md`
 
 > **一张表把"选项文本 + 奖励"都装下**：每个事件 1~3 行；**`EventId + OptionIndex` 组合唯一**。
@@ -27,7 +27,7 @@
 | 导出模式 | **Config** → `EventOptionConfig.json` + `ConfigData/EventOptionConfig.cs` |
 | 数据量级 | **策划建议** MVP 5~15 事件 × 1~3 选项 = **5~45 行** |
 | 关联系统 | M4 剧情事件（局外） |
-| 状态 | **评审中**（规格已出；⚠️ xlsx **由程序用 EPPlus 建**，本次不建表） |
+| 状态 | **已实现**（10行，12列；Json/Config类均存在；本轮仅静态核对，运行证据见20/21报告） |
 
 ---
 
@@ -149,3 +149,5 @@
 | 日期 | 变更 | 变更人 |
 | --- | --- | --- |
 | 2026-10-21 | 首版（W5.1）：定 **12 列**（`Index`/`EventId`/`OptionIndex`/`OptionText`/`GiveResourceType`/`GiveResourceAmount`/`GiveItemId`/`GiveItemCount`/`GiveRetainerId`/`ConfidenceDelta`/`EffectId`/`Enable`）；奖励 **4 类落地**（资源/物品/门客/信心）+ `EffectId` **预留**；`ConfidenceDelta` 用 **`int`**（可负），其余 `uint`；执行顺序与"单项失败不回滚"口径；5 行示例；C1~C11 约束；Q1~Q6 待确认。xlsx 由程序用 EPPlus 建，本次不建表。 | 策划 |
+
+| 2026-10-22 | 同步源表/导出产物已存在的状态；实际配置与奖励快照见21报告。未改字段、源表或数值，未新增运行验收结论。 | 策划 |

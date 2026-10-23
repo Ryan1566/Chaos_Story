@@ -1,8 +1,8 @@
 # `Event` 字段规格说明（剧情事件表）
 
-> 状态：评审中
+> 状态：已实现
 > Owner：策划
-> 最后更新：2026-10-21
+> 最后更新：2026-10-22
 > 关联：`Story/02_系统策划/16_剧情事件.md`（规则与判定口径）、`Story/03_配置表设计/16_EventOption_字段规格.md`（选项与奖励）、`Story/03_配置表设计/01_配置表填写规范.md`、`Assets/Excel/Chaos_excel/Event_剧情事件表.xlsx`
 
 > **触发条件只有 3 种**（用户裁决，原型期不得扩展）：`TriggerType = 1` runs / `2` maxClearedDepth / `3` familyTreeNodes。
@@ -26,7 +26,7 @@
 | 导出模式 | **Config** → `EventConfig.json` + `ConfigData/EventConfig.cs` |
 | 数据量级 | **策划建议** MVP 5~15 行 |
 | 关联系统 | M4 剧情事件（局外）、`16_剧情事件.md` |
-| 状态 | **评审中**（规格已出；⚠️ xlsx **由程序用 EPPlus 建**，本次不建表） |
+| 状态 | **已实现**（5行，8列；Json/Config类均存在；本轮仅静态核对，运行证据见20/21报告） |
 
 ---
 
@@ -127,3 +127,5 @@
 | 日期 | 变更 | 变更人 |
 | --- | --- | --- |
 | 2026-10-21 | 首版（W5.1）：定 **8 列**（`Index`/`TriggerType`/`TriggerValue`/`Repeatable`/`Priority`/`TitleText`/`BodyText`/`Enable`）；`TriggerType` **只有 1/2/3**（用户裁决）+ `TriggerValue` 逐类型语义表；**文本列用中文原文（`*Text`）而非本地化 key**（现有面板不挂 `LocalizedText`，Q1）；写手红线：禁英文逗号/引号/换行；C1~C9 约束（含"每事件至少 1 选项、选项 ≤3"）；Q1~Q5 待确认。xlsx 由程序用 EPPlus 建，本次不建表。 | 策划 |
+
+| 2026-10-22 | 同步源表/导出产物已存在的状态；实际配置与奖励快照见21报告。未改字段、源表或数值，未新增运行验收结论。 | 策划 |
