@@ -1,5 +1,7 @@
 # `FamilyTree` 字段规格说明（家族树节点表）
 
+> 当前表位于MetaSkillTreeTable_局外技能树表.xlsx，节点35行；基础八字段保留，新增DescriptionKey(string)、IconKey(string)、LayoutX(float)、LayoutY(float)、NodeKind(uint，0普通/1关键)、BranchKey(string)。新增“板块”“文案”页追加在原“节点”“效果映射”页之后。导出类名MetaSkillTreeTable_FamilyTreeConfig，文件MetaSkillTreeTable_FamilyTree.json。旧命名及覆盖行为说明是历史记录；当前冲突整批拒绝。具体见系统策划31。
+
 > 状态：评审中
 > Owner：策划
 > 最后更新：2026-10-18

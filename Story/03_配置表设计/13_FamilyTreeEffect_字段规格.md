@@ -1,5 +1,7 @@
 # `FamilyTreeEffect` 字段规格说明（节点效果关联表）
 
+> 本轮现状：MetaSkillTreeTable_局外技能树表.xlsx的第2页“效果映射”，共35行；新增20行挂接新增节点，原15行原样保留。导出MetaSkillTreeTable_FamilyTreeEffect.json及MetaSkillTreeTable_FamilyTreeEffectConfig.cs。原文中的15节点与独立工作簿名属于历史MVP；当前详见系统31。
+
 > 状态：评审中
 > Owner：策划
 > 最后更新：2026-10-18
