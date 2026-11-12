@@ -1,15 +1,13 @@
 # A · UI 预制体素材清单（数据盘点）
 
-> **文档定位**：本文件是数据底稿，不是正式美术需求文档。正式需求由 Lead 基于本文件合成（见同级 `01_美术执行标准与首轮需求.md`）。
+> **文档定位**：历史盘点，用于追溯旧 Sprite 与控件位置。当前生产查 [UI 素材替换总清单](../UI/02_UI素材替换总清单.md) 的用途、尺寸与状态。下文旧尺寸、旧复用判断和统计保留盘点口径。
 > **盘点对象**：25 个 UI 预制体 —— `Assets/Prefabs/UI/SettingRows/` 5 个 + `Assets/Resources/UIPanels/` 19 个 + `UIPanels/SubUI_Prefab/RecordCell.prefab`。
 > **数据来源**：① 全量控件树 dump `Assets/tmp_uidump_prefabs.txt`（421 行，UTF-8，含 RectTransform / Image.sprite / TMP 文本）；② `Assets/Art/UI` 200+ 张 png 的实测像素与 `spriteBorder`（System.Drawing 读像素 + 9 张 meta）；③ 各面板 `*Panel.cs` 代码常量；④ Unity 编辑器 MCP（端口 7891）核验 CanvasScaler 与组件。
 > **盘点时间**：2026-11-08。
 
 ---
 
-## 0. 硬约束（美术规范，先读）
-
-<!-- 以下为硬约束，任何素材产出与复用判定都必须遵守 -->
+## 0. 盘点时的判断口径
 
 1. **素材内不得出现任何可读文字**：汉字、字母、数字、标点、伪文字字形、纹章文字、货币符号、星级符号 —— 全部留空。只有纯几何形状允许。
 2. 因此本清单中**所有 TMP / Text 节点一律判为「不需要新素材」**（文字由运行时文本渲染，素材只提供其底衬）。

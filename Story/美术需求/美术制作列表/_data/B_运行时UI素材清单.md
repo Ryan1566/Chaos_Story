@@ -1,13 +1,14 @@
 # B_运行时UI素材清单（数据盘点）
 
 > 产出方：美术需求数据盘点员（runtime-ui）
+> **文档定位**：历史盘点，用于追溯运行时生成的节点、旧 Sprite 与代码出处。当前生产查 [UI 素材替换总清单](../UI/02_UI素材替换总清单.md) 及按键、地图专项。下文硬约束为当时盘点口径。
 > 盘点范围：`Assets/Scripts/Runtime/MVP/View/`（41 个 .cs）、`Scripts/Runtime/3C/`、`GameBase/UIManager/`、`GameBase/DialogueManager/`、`GameBase/LoadingManager/`、`Assets/Resources/UIPanels/`（20 个 prefab）、`Assets/Resources/UI/`、`Assets/Art/UI/`（164 张 png）
 > Unity 2022.3.57f1c2 / 2D / 参考分辨率 1920×1080（部分 Canvas 1366×768 验收）
 > 所有代码位置均为真实行号（逐文件读取后记录），未做推测。
 
 ---
 
-## 0. 硬约束（写需求时必须整段照搬）
+## 0. 盘点时的判断口径
 
 1. **新素材一律不得含任何可读文字、数字、字母、标点、伪文字字形、货币/星级等符号**，全部留空；仅允许纯几何形状。代码里的文字一律由 TMP 运行时绘制，素材里出现任何字形都会与 TMP 叠印。
 2. 代码里用 `Graphic` / `Image` + 纯色拼出来的元素，**若只是色块则判「不需要新素材」**；确需贴图的一律判「需要但极简（仅圆角/描边）」，不加大面积纹理、不加渐变、不加高光。
